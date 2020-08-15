@@ -1,0 +1,94 @@
+/******************************************************************************
+
+                              Online C++ Compiler.
+               Code, Compile, Run and Debug C++ program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
+#include <iostream>
+
+using namespace std;
+
+template <typename T>
+class unique_pointer {
+ 
+ private:
+    T* ptr;
+ 
+ public:
+    explicit unique_pointer(T* aPtr)
+    {
+        ptr = aPtr;
+    }
+    
+    ~unique_pointer()
+    {
+        if(ptr) {
+            delete ptr;
+        }
+    }
+    
+    void reset()
+    {
+        ptr = nullptr;
+    }
+    
+    void increment(T aNumber)
+    {
+        *ptr += aNumber;
+    }
+    
+    // Should not allow copy constructor && copy assignment
+    unique_pointer(unique_pointer<T>& aCopy) = delete;
+    unique_pointer& operator=(unique_pointer<T>& aCopy) = delete;
+    
+    unique_pointer(unique_pointer<T>&& aMove)
+    {
+        ptr = aMove.get();
+        aMove.reset();
+    }
+    
+    unique_pointer& operator=(unique_pointer<T>&& aMoveAssignment)
+    {
+        ptr = aMoveAssignment.get();
+        aMoveAssignment.reset();
+    }
+    
+    T* get() const
+    {
+        return ptr;
+    }
+    
+    T* operator->() const
+    {
+        return ptr;
+    }
+    
+    T& operator*() const
+    {
+        return *ptr;
+    }
+    
+};
+
+int main()
+{
+    int* aMem = new int(10);
+    unique_pointer<int> myPtr(aMem);
+    unique_pointer<int> myNewPtr(std::move(myPtr));
+    //unique_pointer<int> myPtrNew = myPtr;
+
+    std::cout << *myNewPtr << std::endl;
+    myNewPtr.increment(10);
+    std::cout << *myNewPtr << std::endl;
+    unique_pointer<int> myThirdPtr = std::move(myNewPtr);
+    std::cout << *myThirdPtr << std::endl;
+    
+    bool isEmpty = myNewPtr.get() == nullptr ? true : false;
+    if(isEmpty)
+    {
+        std::cout << "Old pointer deleted" << std::endl;
+    }
+    return 0;
+}
