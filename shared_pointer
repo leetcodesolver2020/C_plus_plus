@@ -1,0 +1,90 @@
+/******************************************************************************
+
+                              Online C++ Compiler.
+               Code, Compile, Run and Debug C++ program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
+#include <iostream>
+
+using namespace std;
+
+template <typename T>
+class shared_pointer {
+ 
+ private:
+    T* ptr;
+    int* count;
+ 
+ public:
+    shared_pointer(T* aPtr)
+    {
+        ptr = aPtr;
+        count = new int(0);
+        if(ptr)
+        {
+            (*count)++;
+        }
+    }
+    
+    ~shared_pointer()
+    {
+        (*count)--;
+        
+        if(*count == 0)
+        {
+            std::cout << "Freeing the mess you made" << std::endl;
+            delete ptr;
+            ptr = nullptr;
+            
+            delete count;
+            count = nullptr;
+        }
+    }
+    
+    shared_pointer(shared_pointer<T>& aCopy)
+    {
+        ptr = aCopy.get();
+        count = aCopy.getCount();
+        (*count)++;
+    }
+    
+    T* get()
+    {
+        return ptr;
+    }
+    
+    T* operator->()
+    {
+        return ptr;
+    }
+    
+    T& operator*()
+    {
+        return *ptr;
+    }
+    
+    int* getCount()
+    {
+        return count;
+    }
+    
+    int useCount()
+    {
+        return *count;
+    }
+    
+};
+
+int main()
+{
+    int* aMem = new int(10);
+    shared_pointer<int> myPtr(aMem);
+    shared_pointer<int> myNewPtr(myPtr);
+
+    std::cout << *myPtr << std::endl;
+    std::cout << myPtr.useCount() << std::endl;
+    std::cout << *myNewPtr << std::endl;
+    return 0;
+}
