@@ -1,0 +1,146 @@
+/******************************************************************************
+
+Welcome to GDB Online.
+GDB online is an online compiler and debugger tool for C, C++, Python, PHP, Ruby, 
+C#, VB, Perl, Swift, Prolog, Javascript, Pascal, HTML, CSS, JS
+Code, Compile, Run and Debug online from anywhere in world.
+
+*******************************************************************************/
+#include <stdio.h>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <cstdint>
+#include <cstring>
+
+class myString
+{
+    char* myData;
+    int mySize;
+    
+    public:
+    myString(const char* str)
+    {
+        std::cout << "Constructing\n";
+        mySize = sizeof(str);
+        myData = new char[mySize];
+        std::memcpy(myData, str, mySize+1);
+    }
+    
+    myString(myString& other)
+    {
+        std::cout << "Copying\n";
+        mySize = other.getSize();
+        myData = new char[mySize];
+        std::memcpy(myData, other.getData(), mySize+1);
+    }
+    
+    myString(myString&& other)
+    {
+        std::cout << "Moving\n";
+        mySize = other.getSize();
+        myData = other.getData();
+        
+        other.resetSize();
+        other.deleteData();
+    }
+    
+    myString& operator=(myString& other)
+    {
+        std::cout << "Assigning\n";
+        mySize = other.getSize();
+        myData = new char[mySize];
+        std::memcpy(myData, other.getData(), mySize+1);
+    }
+    
+    myString& operator=(myString&& other)
+    {
+        std::cout << "Move Assigning\n";
+        
+        if(&other != this) {
+            this->deleteData();
+            
+            mySize = other.getSize();
+            myData = other.getData();
+        
+            other.resetSize();
+            other.deleteData();
+        }
+        
+        return *this;
+    }
+    
+    
+    ~myString()
+    {
+        delete[] myData;
+    }
+    
+    void resetSize()
+    {
+        mySize = 0;
+    }
+    
+    void deleteData()
+    {
+        myData = nullptr;
+    }
+    
+    int getSize() const
+    {
+        return mySize;
+    }
+    
+    char* getData() const
+    {
+        return myData;
+    }
+    
+    void print()
+    {
+        for(int i = 0; i < mySize; i++)
+        {
+            std::cout << myData[i];
+        }
+        std::cout << std::endl;
+    }
+};
+
+class myClass{
+    myString str;
+    
+    public:
+    myClass(myString& aStr)
+    : str(aStr)
+    {}
+    
+    myClass(myString&& aStr)
+    : str(std::move(aStr))
+    {}
+    
+    void print()
+    {
+        str.print();
+    }
+};
+
+int main()
+{
+    myClass aObj("Colorado");
+    aObj.print();
+    
+    myString otherStr = "Rockies";
+    otherStr.print();
+    
+    myString copy("");
+    copy = otherStr;
+    copy.print();
+    
+    myString move("");
+    move = std::move(otherStr);
+    copy.print();
+    std::cout << "OtherStr" << std::endl;
+    otherStr.print();
+
+    return 0;
+}
